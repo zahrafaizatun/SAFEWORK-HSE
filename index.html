@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAFEWORK HSE - Construction Safety Management System</title>
+  <meta name="description" content="Sistem Manajemen K3 Proyek Konstruksi Teknik Sipil - Simulasi SMK3 dan HIRADC">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- APP CONTAINER -->
+  <div class="app-layout">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <div class="logo-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="brand-text">
+            <h2>SAFEWORK <span>HSE</span></h2>
+            <p>Construction Safety MS</p>
+          </div>
+        </div>
+        <button class="btn-close-sidebar" id="btnCloseSidebar" title="Tutup Menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- ACTIVE PROJECT BADGE -->
+      <div class="sidebar-project-pill" id="sidebarProjectPill" title="Klik untuk beralih proyek atau ubah identitas proyek">
+        <div class="pulse-indicator"></div>
+        <div class="project-pill-text">
+          <div class="pill-top-row">
+            <span class="label">Proyek Aktif</span>
+            <span class="project-type-chip" id="sidebarProjectType">Gedung</span>
+          </div>
+          <strong id="sidebarProjectName">Proyek Gedung Mandiri Tower</strong>
+          <span class="sidebar-location-sub" id="sidebarProjectLocation"><i class="fa-solid fa-location-dot"></i> Sleman, D.I. Yogyakarta</span>
+        </div>
+      </div>
+
+      <!-- NAVIGATION MENU -->
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="#dashboard" class="nav-link active" data-page="dashboard">
+              <i class="fa-solid fa-chart-pie"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#inspeksi" class="nav-link" data-page="inspeksi">
+              <i class="fa-solid fa-clipboard-check"></i>
+              <span>Inspeksi K3</span>
+              <span class="nav-badge" id="badgeInspeksiCount">0</span>
+            </a>
+          </li>
+          <li>
+            <a href="#risiko" class="nav-link" data-page="risiko">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>Penilaian Risiko</span>
+              <span class="nav-badge matrix-tag">5x5</span>
+            </a>
+          </li>
+          <li>
+            <a href="#temuan" class="nav-link" data-page="temuan">
+              <i class="fa-solid fa-magnifying-glass-chart"></i>
+              <span>Temuan K3</span>
+              <span class="nav-badge danger-tag" id="badgeTemuanOpenCount">0</span>
+            </a>
+          </li>
+          <li>
+            <a href="#laporan" class="nav-link" data-page="laporan">
+              <i class="fa-solid fa-file-invoice"></i>
+              <span>Laporan & Rekap</span>
+            </a>
+          </li>
+          <li>
+            <a href="#pengaturan" class="nav-link" data-page="pengaturan">
+              <i class="fa-solid fa-sliders"></i>
+              <span>Pengaturan</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- SIDEBAR FOOTER (SIMULATED USER) -->
+      <div class="sidebar-footer">
+        <div class="user-profile-card">
+          <div class="user-avatar">
+            <i class="fa-solid fa-user-helmet-safety"></i>
+          </div>
+          <div class="user-info">
+            <strong id="sidebarUserName">Zahra Faizatun N.</strong>
+            <span>HSE Site Engineer (TS01)</span>
+          </div>
+        </div>
+        <div class="academic-tag">
+          <i class="fa-solid fa-graduation-cap"></i> Teknik Sipil - Sem 5
+        </div>
+      </div>
+    </aside>
+
+    <!-- SIDEBAR OVERLAY FOR MOBILE -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      
+      <!-- TOP HEADER BAR -->
+      <header class="app-header">
+        <div class="header-left">
+          <button class="btn-toggle-menu" id="btnToggleMenu" title="Buka Menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="page-title-box">
+            <h1 id="pageTitle">Dashboard K3 Konstruksi</h1>
+            <div class="breadcrumb" id="pageBreadcrumb">
+              <span>SAFEWORK HSE</span> <i class="fa-solid fa-chevron-right"></i> <strong id="breadcrumbCurrent">Dashboard</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Active Project Quick Switcher (Feature 8 & 9) -->
+          <div class="header-project-box" title="Beralih Proyek Konstruksi Aktif">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <select id="headerProjectSelector" class="header-project-select" aria-label="Pilih Proyek Aktif">
+              <!-- Injected via JS -->
+            </select>
+          </div>
+
+          <button class="btn btn-outline btn-sm" id="btnHeaderNewProject" title="Buat Proyek Konstruksi Baru">
+            <i class="fa-solid fa-plus"></i>
+            <span class="btn-text">Proyek Baru</span>
+          </button>
+
+          <!-- Realtime Date & Time -->
+          <div class="datetime-pill">
+            <i class="fa-regular fa-clock"></i>
+            <span id="liveClock">Memuat waktu...</span>
+          </div>
+
+          <!-- Safety Zero Accident Counter -->
+          <div class="safety-hours-pill" title="Jam Kerja Selamat Tanpa Fatality">
+            <div class="shield-dot"></div>
+            <span>Jam Selamat: <strong id="headerSafeHours">428,500</strong> Jam</span>
+          </div>
+
+          <!-- Quick Action Button -->
+          <button class="btn btn-primary btn-sm" id="btnQuickAddFinding">
+            <i class="fa-solid fa-plus"></i>
+            <span class="btn-text">Temuan Baru</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- PRINT-ONLY LETTERHEAD (Visible only when printed) -->
+      <div class="print-letterhead" id="printLetterhead">
+        <div class="print-header-top">
+          <div class="print-logo">
+            <h2>SAFEWORK HSE</h2>
+            <p>CONSTRUCTION HEALTH, SAFETY, AND ENVIRONMENT MANAGEMENT SYSTEM</p>
+            <span class="sub">Simulasi SMK3 Proyek Konstruksi - Standar Permen PUPR No. 10/2021 & PP No. 50/2012</span>
+          </div>
+          <div class="print-meta">
+            <p><strong>Nomor Dokumen:</strong> HSE-REP/<span id="printDocDate">2026</span>/001</p>
+            <p><strong>Tanggal Cetak:</strong> <span id="printDateStr">29 Oktober 2026</span></p>
+            <p><strong>Status:</strong> RESMI / TERVALIDASI</p>
+          </div>
+        </div>
+        <div class="print-project-info">
+          <div><strong>Proyek:</strong> <span id="printProjectName">Proyek Gedung Mandiri Tower</span> (<span id="printProjectType">Gedung</span>)</div>
+          <div><strong>Kontraktor:</strong> <span id="printContractor">PT Graha Konstruksi Pratama</span></div>
+          <div><strong>Lokasi:</strong> <span id="printLocation">Jl. Ring Road Utara, Sleman, D.I. Yogyakarta</span></div>
+          <div><strong>Penanggung Jawab (PM):</strong> <span id="printProjectManager">Ir. Hendra Pratama, S.T., M.T.</span></div>
+          <div><strong>HSE Inspector:</strong> <span id="printHseOfficer">Zahra Faizatun Najma</span></div>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT VIEW CONTAINER -->
+      <main class="content-container">
+
+        <!-- ========================================================
+             1. HALAMAN DASHBOARD
+             ======================================================== -->
+        <section class="page-view active" id="view-dashboard">
+
+          <!-- INDIKATOR LOKASI & IDENTITAS PROYEK AKTIF (FEATURE 1, 4, 7) -->
+          <div class="project-identity-card card" id="dashProjectIdentityCard">
+            <div class="proj-id-left">
+              <div class="proj-type-avatar" id="dashProjTypeAvatar">
+                <i class="fa-solid fa-building"></i>
+              </div>
+              <div class="proj-id-details">
+                <div class="proj-badges-row">
+                  <span class="badge badge-primary font-semibold" id="dashProjTypeBadge"><i class="fa-solid fa-helmet-safety"></i> Jenis: Gedung</span>
+                  <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Proyek Aktif</span>
+                  <span class="badge badge-neutral" id="dashProjCityBadge"><i class="fa-solid fa-location-dot"></i> Sleman, D.I. Yogyakarta</span>
+                </div>
+                <h2 class="proj-title" id="dashProjName">Proyek Pembangunan Gedung Mandiri Tower (10 Lantai)</h2>
+                <div class="proj-meta-grid">
+                  <div class="meta-item">
+                    <span class="meta-label"><i class="fa-solid fa-map-pin"></i> Alamat Proyek:</span>
+                    <strong class="meta-value" id="dashProjAddress">Jl. Ring Road Utara No. 45, Condongcatur</strong>
+                  </div>
+                  <div class="meta-item">
+                    <span class="meta-label"><i class="fa-solid fa-city"></i> Kota & Provinsi:</span>
+                    <strong class="meta-value" id="dashProjCityProv">Kabupaten Sleman, D.I. Yogyakarta</strong>
+                  </div>
+                  <div class="meta-item">
+                    <span class="meta-label"><i class="fa-solid fa-hard-hat"></i> Kontraktor Utama:</span>
+                    <strong class="meta-value" id="dashProjContractor">PT Graha Konstruksi Pratama</strong>
+                  </div>
+                  <div class="meta-item">
+                    <span class="meta-label"><i class="fa-solid fa-user-tie"></i> Penanggung Jawab (PM):</span>
+                    <strong class="meta-value" id="dashProjManager">Ir. Hendra Pratama, S.T., M.T.</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="proj-id-actions">
+              <button class="btn btn-secondary btn-sm" id="btnDashSwitchProject">
+                <i class="fa-solid fa-repeat"></i> Beralih Proyek
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="app.navigateTo('pengaturan')">
+                <i class="fa-solid fa-gear"></i> Kelola Lokasi & Identitas
+              </button>
+            </div>
+          </div>
+          
+          <!-- BANNER STATUS KESELAMATAN PROYEK -->
+          <div class="safety-banner" id="dashboardSafetyBanner">
+            <div class="banner-icon">
+              <i class="fa-solid fa-shield-heart"></i>
+            </div>
+            <div class="banner-content">
+              <h3>Status Keselamatan Proyek: <span class="badge badge-success" id="bannerSafetyStatusBadge">AMAN / TERKENDALI</span></h3>
+              <p id="bannerSafetyMessage">Tingkat penyelesaian temuan K3 mencapai 83.3%. Tidak ada insiden LTI (Lost Time Injury). Lanjutkan pengawasan ketat terhadap proteksi jatuh di lantai tinggi.</p>
+            </div>
+            <div class="banner-stat">
+              <div class="stat-unit">
+                <span class="value" id="dashSafetyScore">88%</span>
+                <span class="label">Indeks K3 (Safety Index)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STATISTIK KARTU UTAMA -->
+          <div class="stats-grid">
+            <!-- Card 1: Total Inspeksi -->
+            <div class="stat-card">
+              <div class="stat-icon icon-blue">
+                <i class="fa-solid fa-clipboard-list"></i>
+              </div>
+              <div class="stat-details">
+                <span class="stat-title">Total Inspeksi K3</span>
+                <h3 class="stat-value" id="dashTotalInspeksi">0</h3>
+                <span class="stat-sub text-muted" id="dashSubInspeksi">0 selesai, 0 tindak lanjut</span>
+              </div>
+            </div>
+
+            <!-- Card 2: Total Temuan -->
+            <div class="stat-card">
+              <div class="stat-icon icon-amber">
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+              </div>
+              <div class="stat-details">
+                <span class="stat-title">Total Temuan K3</span>
+                <h3 class="stat-value" id="dashTotalTemuan">0</h3>
+                <span class="stat-sub text-muted" id="dashSubTemuan">Kondisi & Tindakan Tidak Aman</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Temuan Terbuka (Open/In Progress) -->
+            <div class="stat-card">
+              <div class="stat-icon icon-red">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
+              <div class="stat-details">
+                <span class="stat-title">Temuan Belum Selesai</span>
+                <h3 class="stat-value text-danger" id="dashTemuanOpen">0</h3>
+                <span class="stat-sub text-danger" id="dashSubTemuanOpen">Memerlukan mitigasi segera</span>
+              </div>
+            </div>
+
+            <!-- Card 4: Temuan Selesai (Closed) -->
+            <div class="stat-card">
+              <div class="stat-icon icon-green">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+              <div class="stat-details">
+                <span class="stat-title">Temuan Selesai</span>
+                <h3 class="stat-value text-success" id="dashTemuanClosed">0</h3>
+                <span class="stat-sub text-success" id="dashSubResolutionRate">Tingkat resolusi: 0%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KARTU DISTRIBUSI RISIKO -->
+          <div class="risk-distribution-bar-card card">
+            <div class="card-header-simple">
+              <h4><i class="fa-solid fa-layer-group"></i> Distribusi Tingkat Risiko K3</h4>
+              <span class="text-muted text-sm">Berdasarkan data Penilaian Risiko (HIRADC) & Temuan</span>
+            </div>
+            <div class="risk-counters-row">
+              <div class="risk-pill-box pill-low">
+                <span class="risk-name">Rendah (1-4)</span>
+                <strong id="dashRiskCountLow">0</strong>
+              </div>
+              <div class="risk-pill-box pill-med">
+                <span class="risk-name">Sedang (5-9)</span>
+                <strong id="dashRiskCountMed">0</strong>
+              </div>
+              <div class="risk-pill-box pill-high">
+                <span class="risk-name">Tinggi (10-16)</span>
+                <strong id="dashRiskCountHigh">0</strong>
+              </div>
+              <div class="risk-pill-box pill-ext">
+                <span class="risk-name">Ekstrem (17-25)</span>
+                <strong id="dashRiskCountExt">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- CHARTS GRID -->
+          <div class="charts-grid">
+            <!-- Chart 1: Temuan per Kategori -->
+            <div class="chart-card card">
+              <div class="card-header">
+                <div>
+                  <h4>Temuan K3 Berdasarkan Kategori</h4>
+                  <p class="card-subtitle">Sebaran pelanggaran APD, housekeeping, perancah, listrik, dll.</p>
+                </div>
+                <span class="badge badge-primary"><i class="fa-solid fa-chart-pie"></i> Kategori</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chartCategory"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 2: Tren Bulanan Inspeksi & Temuan -->
+            <div class="chart-card card">
+              <div class="card-header">
+                <div>
+                  <h4>Tren Inspeksi & Temuan K3 Bulanan</h4>
+                  <p class="card-subtitle">Perbandingan aktivitas inspeksi dan temuan 6 bulan terakhir</p>
+                </div>
+                <span class="badge badge-info"><i class="fa-solid fa-chart-line"></i> Tren Waktu</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chartMonthly"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- TABEL TEMUAN K3 TERBARU -->
+          <div class="card mt-4">
+            <div class="card-header">
+              <div>
+                <h4>Daftar Temuan K3 Terbaru</h4>
+                <p class="card-subtitle">5 catatan ketidaksesuaian keselamatan terakhir di lapangan konstruksi</p>
+              </div>
+              <a href="#temuan" class="btn btn-secondary btn-sm" onclick="app.navigateTo('temuan')">
+                <span>Lihat Semua Temuan</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No. Temuan</th>
+                    <th>Tanggal</th>
+                    <th>Area Kerja</th>
+                    <th>Kategori</th>
+                    <th>Deskripsi Bahaya</th>
+                    <th>Tingkat Risiko</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="dashRecentFindingsTbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             2. HALAMAN INSPEKSI K3
+             ======================================================== -->
+        <section class="page-view" id="view-inspeksi">
+          
+          <!-- PROJECT CONTEXT BAR -->
+          <div class="project-context-bar">
+            <div class="context-bar-left">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <span>Proyek Aktif: <strong class="ctx-project-name">Memuat...</strong> (<span class="ctx-project-type">Gedung</span>)</span>
+              <span class="ctx-divider">•</span>
+              <span class="ctx-project-location text-muted"><i class="fa-solid fa-location-dot"></i> Memuat lokasi...</span>
+              <span class="ctx-divider">•</span>
+              <span class="text-muted">Kontraktor: <strong class="ctx-project-contractor">Memuat...</strong></span>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="app.openProjectSwitchModal()">
+              <i class="fa-solid fa-repeat"></i> Ganti Proyek
+            </button>
+          </div>
+
+          <div class="page-toolbar">
+            <div class="toolbar-search">
+              <i class="fa-solid fa-search"></i>
+              <input type="text" id="filterInspeksiSearch" placeholder="Cari nomor, area, atau petugas inspeksi...">
+            </div>
+            <div class="toolbar-filters">
+              <select id="filterInspeksiCategory" class="form-select">
+                <option value="">Semua Kategori</option>
+                <option value="Penggunaan APD">Penggunaan APD</option>
+                <option value="Housekeeping">Housekeeping</option>
+                <option value="Perancah dan akses kerja">Perancah & Akses Kerja</option>
+                <option value="Instalasi listrik">Instalasi Listrik</option>
+                <option value="Alat dan mesin">Alat & Mesin</option>
+                <option value="Pengendalian area kerja">Pengendalian Area Kerja</option>
+                <option value="Rambu dan pengamanan lokasi">Rambu & Pengamanan Lokasi</option>
+              </select>
+
+              <select id="filterInspeksiStatus" class="form-select">
+                <option value="">Semua Status</option>
+                <option value="Selesai">Selesai</option>
+                <option value="Perlu Tindak Lanjut">Perlu Tindak Lanjut</option>
+                <option value="Draft">Draft</option>
+              </select>
+
+              <button class="btn btn-primary" id="btnOpenModalInspeksi">
+                <i class="fa-solid fa-plus"></i> Tambah Inspeksi Baru
+              </button>
+            </div>
+          </div>
+
+          <!-- TABLE INSPEKSI -->
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No. Inspeksi</th>
+                    <th>Tanggal</th>
+                    <th>Area / Lokasi Kerja</th>
+                    <th>Kategori</th>
+                    <th>Petugas HSE</th>
+                    <th>Hasil Checklist</th>
+                    <th>Status</th>
+                    <th class="text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tableInspeksiTbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer" id="tableInspeksiFooter">
+              <span class="text-muted" id="inspeksiCountInfo">Menampilkan 0 data</span>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             3. HALAMAN PENILAIAN RISIKO (HIRADC 5x5)
+             ======================================================== -->
+        <section class="page-view" id="view-risiko">
+          
+          <!-- PROJECT CONTEXT BAR -->
+          <div class="project-context-bar">
+            <div class="context-bar-left">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <span>Proyek Aktif: <strong class="ctx-project-name">Memuat...</strong> (<span class="ctx-project-type">Gedung</span>)</span>
+              <span class="ctx-divider">•</span>
+              <span class="ctx-project-location text-muted"><i class="fa-solid fa-location-dot"></i> Memuat lokasi...</span>
+              <span class="ctx-divider">•</span>
+              <span class="text-muted">Kontraktor: <strong class="ctx-project-contractor">Memuat...</strong></span>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="app.openProjectSwitchModal()">
+              <i class="fa-solid fa-repeat"></i> Ganti Proyek
+            </button>
+          </div>
+
+          <!-- ACADEMIC NOTICE -->
+          <div class="academic-alert">
+            <div class="alert-icon"><i class="fa-solid fa-book-open"></i></div>
+            <div class="alert-text">
+              <strong>Simulasi Akademik K3 Konstruksi (Metode HIRADC 5×5):</strong>
+              <p>Perhitungan skor risiko mengacu pada rumus <code>Risk Score = Likelihood (1–5) × Severity (1–5)</code>. Matriks ini merupakan simulasi untuk pemenuhan tugas mata kuliah Aplikasi Komputer Teknik Sipil (berdasarkan prinsip Permen PUPR No. 10/2021 dan PP No. 50/2012).</p>
+            </div>
+          </div>
+
+          <div class="page-toolbar">
+            <div class="toolbar-search">
+              <i class="fa-solid fa-search"></i>
+              <input type="text" id="filterRisikoSearch" placeholder="Cari aktivitas pekerjaan, potensi bahaya, atau dampak...">
+            </div>
+            <div class="toolbar-filters">
+              <select id="filterRisikoLevel" class="form-select">
+                <option value="">Semua Tingkat Risiko</option>
+                <option value="Rendah">Rendah (1-4)</option>
+                <option value="Sedang">Sedang (5-9)</option>
+                <option value="Tinggi">Tinggi (10-16)</option>
+                <option value="Ekstrem">Ekstrem (17-25)</option>
+              </select>
+
+              <button class="btn btn-secondary" id="btnShowMatrixModal">
+                <i class="fa-solid fa-table-cells"></i> Panduan Matriks 5×5
+              </button>
+
+              <button class="btn btn-primary" id="btnOpenModalRisiko">
+                <i class="fa-solid fa-plus"></i> Tambah Penilaian Risiko
+              </button>
+            </div>
+          </div>
+
+          <!-- TABLE RISIKO -->
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No. RA</th>
+                    <th>Aktivitas Pekerjaan</th>
+                    <th>Potensi Bahaya</th>
+                    <th>Konsekuensi / Dampak</th>
+                    <th>L × S</th>
+                    <th>Skor & Kategori</th>
+                    <th>Rekomendasi Pengendalian</th>
+                    <th>PIC & Target</th>
+                    <th class="text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tableRisikoTbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer" id="tableRisikoFooter">
+              <span class="text-muted" id="risikoCountInfo">Menampilkan 0 data</span>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             4. HALAMAN TEMUAN K3 (UNSAFE ACT / CONDITION)
+             ======================================================== -->
+        <section class="page-view" id="view-temuan">
+          
+          <!-- PROJECT CONTEXT BAR -->
+          <div class="project-context-bar">
+            <div class="context-bar-left">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <span>Proyek Aktif: <strong class="ctx-project-name">Memuat...</strong> (<span class="ctx-project-type">Gedung</span>)</span>
+              <span class="ctx-divider">•</span>
+              <span class="ctx-project-location text-muted"><i class="fa-solid fa-location-dot"></i> Memuat lokasi...</span>
+              <span class="ctx-divider">•</span>
+              <span class="text-muted">Kontraktor: <strong class="ctx-project-contractor">Memuat...</strong></span>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="app.openProjectSwitchModal()">
+              <i class="fa-solid fa-repeat"></i> Ganti Proyek
+            </button>
+          </div>
+
+          <div class="page-toolbar">
+            <div class="toolbar-search">
+              <i class="fa-solid fa-search"></i>
+              <input type="text" id="filterTemuanSearch" placeholder="Cari nomor temuan, area, atau deskripsi bahaya...">
+            </div>
+            <div class="toolbar-filters">
+              <select id="filterTemuanCategory" class="form-select">
+                <option value="">Semua Kategori</option>
+                <option value="Penggunaan APD">Penggunaan APD</option>
+                <option value="Housekeeping">Housekeeping</option>
+                <option value="Perancah dan akses kerja">Perancah & Akses Kerja</option>
+                <option value="Instalasi listrik">Instalasi Listrik</option>
+                <option value="Alat dan mesin">Alat & Mesin</option>
+                <option value="Pengendalian area kerja">Pengendalian Area Kerja</option>
+                <option value="Rambu dan pengamanan lokasi">Rambu & Pengamanan Lokasi</option>
+              </select>
+
+              <select id="filterTemuanRisk" class="form-select">
+                <option value="">Semua Tingkat Risiko</option>
+                <option value="Rendah">Rendah</option>
+                <option value="Sedang">Sedang</option>
+                <option value="Tinggi">Tinggi</option>
+                <option value="Ekstrem">Ekstrem</option>
+              </select>
+
+              <select id="filterTemuanStatus" class="form-select">
+                <option value="">Semua Status</option>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Closed">Closed</option>
+              </select>
+
+              <button class="btn btn-primary" id="btnOpenModalTemuan">
+                <i class="fa-solid fa-plus"></i> Catat Temuan Baru
+              </button>
+            </div>
+          </div>
+
+          <!-- TABLE TEMUAN -->
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No. Temuan</th>
+                    <th>Tanggal</th>
+                    <th>Area / Lokasi</th>
+                    <th>Kategori</th>
+                    <th>Deskripsi Temuan</th>
+                    <th>Risiko</th>
+                    <th>Tindakan Korektif</th>
+                    <th>PIC & Target</th>
+                    <th>Status</th>
+                    <th class="text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tableTemuanTbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer" id="tableTemuanFooter">
+              <span class="text-muted" id="temuanCountInfo">Menampilkan 0 data</span>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             5. HALAMAN LAPORAN & REKAPITULASI
+             ======================================================== -->
+        <section class="page-view" id="view-laporan">
+          
+          <!-- PROJECT CONTEXT BAR -->
+          <div class="project-context-bar">
+            <div class="context-bar-left">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <span>Proyek Aktif: <strong class="ctx-project-name">Memuat...</strong> (<span class="ctx-project-type">Gedung</span>)</span>
+              <span class="ctx-divider">•</span>
+              <span class="ctx-project-location text-muted"><i class="fa-solid fa-location-dot"></i> Memuat lokasi...</span>
+              <span class="ctx-divider">•</span>
+              <span class="text-muted">Kontraktor: <strong class="ctx-project-contractor">Memuat...</strong></span>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="app.openProjectSwitchModal()">
+              <i class="fa-solid fa-repeat"></i> Ganti Proyek
+            </button>
+          </div>
+
+          <!-- CONTROLS & EXPORT ACTIONS -->
+          <div class="report-header-card card">
+            <div class="report-filters-row">
+              <div class="date-filter-group">
+                <label><i class="fa-regular fa-calendar"></i> Dari Tanggal:</label>
+                <input type="date" id="reportStartDate" class="form-input">
+              </div>
+              <div class="date-filter-group">
+                <label><i class="fa-regular fa-calendar"></i> Sampai Tanggal:</label>
+                <input type="date" id="reportEndDate" class="form-input">
+              </div>
+              <div class="date-filter-group">
+                <label><i class="fa-solid fa-filter"></i> Status Temuan:</label>
+                <select id="reportFilterStatus" class="form-select">
+                  <option value="">Semua Status</option>
+                  <option value="Open">Hanya Open</option>
+                  <option value="In Progress">Hanya In Progress</option>
+                  <option value="Closed">Hanya Closed</option>
+                </select>
+              </div>
+              <button class="btn btn-secondary" id="btnApplyReportFilter">
+                <i class="fa-solid fa-arrows-rotate"></i> Terapkan Filter
+              </button>
+              <button class="btn btn-outline" id="btnResetReportFilter">
+                Reset Filter
+              </button>
+            </div>
+
+            <div class="export-buttons-group">
+              <button class="btn btn-primary" id="btnPrintReport">
+                <i class="fa-solid fa-print"></i> Cetak / Simpan PDF
+              </button>
+              <div class="dropdown-csv-wrapper">
+                <button class="btn btn-success" id="btnExportMenuToggle">
+                  <i class="fa-solid fa-file-excel"></i> Ekspor CSV / Excel <i class="fa-solid fa-caret-down"></i>
+                </button>
+                <div class="dropdown-csv-menu" id="dropdownCsvMenu">
+                  <button type="button" class="csv-item" id="btnExportInspeksiCsv">
+                    <i class="fa-solid fa-clipboard-check"></i> Ekspor Inspeksi K3 (.csv)
+                  </button>
+                  <button type="button" class="csv-item" id="btnExportRisikoCsv">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Ekspor Penilaian Risiko HIRADC (.csv)
+                  </button>
+                  <button type="button" class="csv-item" id="btnExportTemuanCsv">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i> Ekspor Temuan K3 (.csv)
+                  </button>
+                  <button type="button" class="csv-item" id="btnExportAllCsv">
+                    <i class="fa-solid fa-database"></i> Ekspor Semua Data (3 File Terpisah)
+                  </button>
+                </div>
+              </div>
+              <button class="btn btn-danger-outline" id="btnResetDataDemo">
+                <i class="fa-solid fa-rotate-left"></i> Reset Data Demo
+              </button>
+            </div>
+          </div>
+
+          <!-- SUMMARY KPI CARDS REKAPITULASI -->
+          <div class="stats-grid mt-4">
+            <div class="stat-card">
+              <div class="stat-icon icon-blue"><i class="fa-solid fa-clipboard-list"></i></div>
+              <div class="stat-details">
+                <span class="stat-title">Inspeksi Pada Periode</span>
+                <h3 class="stat-value" id="repTotalInspeksi">0</h3>
+                <span class="stat-sub text-muted">Pelaksanaan inspeksi lapangan</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon icon-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div class="stat-details">
+                <span class="stat-title">Total Temuan K3</span>
+                <h3 class="stat-value" id="repTotalTemuan">0</h3>
+                <span class="stat-sub text-muted">Ketidaksesuaian teridentifikasi</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon icon-green"><i class="fa-solid fa-check-double"></i></div>
+              <div class="stat-details">
+                <span class="stat-title">Persentase Selesai</span>
+                <h3 class="stat-value text-success" id="repResolutionRate">0%</h3>
+                <span class="stat-sub text-success" id="repClosedCount">0 temuan terselesaikan</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon icon-red"><i class="fa-solid fa-fire"></i></div>
+              <div class="stat-details">
+                <span class="stat-title">Risiko Tinggi & Ekstrem</span>
+                <h3 class="stat-value text-danger" id="repHighExtremeCount">0</h3>
+                <span class="stat-sub text-danger">Memerlukan mitigasi ketat</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- REKAP KATEGORI & DISTRIBUSI -->
+          <div class="charts-grid mt-4">
+            <div class="card">
+              <div class="card-header">
+                <h4><i class="fa-solid fa-chart-column"></i> Rekap Temuan Berdasarkan Kategori</h4>
+              </div>
+              <div class="category-breakdown-list" id="repCategoryBreakdown">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h4><i class="fa-solid fa-gauge-high"></i> Distribusi Tingkat Risiko Temuan</h4>
+              </div>
+              <div class="risk-breakdown-list" id="repRiskBreakdown">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- DAFTAR TEMUAN TERBUKA PRIORITAS -->
+          <div class="card mt-4">
+            <div class="card-header">
+              <div>
+                <h4><i class="fa-solid fa-clock-rotate-left text-danger"></i> Daftar Temuan yang Masih Terbuka (Open / In Progress)</h4>
+                <p class="card-subtitle">Perhatian khusus: Tindakan korektif harus diselesaikan sebelum batas target penyelesaian</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No. Temuan</th>
+                    <th>Tanggal</th>
+                    <th>Area Kerja</th>
+                    <th>Kategori</th>
+                    <th>Deskripsi Bahaya</th>
+                    <th>Risiko</th>
+                    <th>Rekomendasi Tindakan</th>
+                    <th>PIC</th>
+                    <th>Target Selesai</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="repOpenFindingsTbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- PRINT SIGNATURE SECTION (Appears only on printed report) -->
+          <div class="print-signatures-box">
+            <div class="sig-column">
+              <p class="sig-title">Disiapkan Oleh (HSE Inspector):</p>
+              <div class="sig-space"></div>
+              <p class="sig-name" id="sigPreparerName">Zahra Faizatun Najma</p>
+              <p class="sig-role">HSE Site Engineer / NIM: 2410503008</p>
+            </div>
+            <div class="sig-column">
+              <p class="sig-title">Diperiksa Oleh (HSE Coordinator):</p>
+              <div class="sig-space"></div>
+              <p class="sig-name">Budi Santoso, S.T.</p>
+              <p class="sig-role">HSE Coordinator / Ahli K3 Konstruksi</p>
+            </div>
+            <div class="sig-column">
+              <p class="sig-title">Disetujui Oleh (Project Manager):</p>
+              <div class="sig-space"></div>
+              <p class="sig-name" id="sigManagerName">Ir. Hendra Pratama, S.T., M.T.</p>
+              <p class="sig-role">Project Manager Proyek Konstruksi</p>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             6. HALAMAN PENGATURAN & INFORMASI
+             ======================================================== -->
+        <section class="page-view" id="view-pengaturan">
+          
+          <div class="settings-grid">
+            <!-- Form Pengaturan Identitas & Lokasi Proyek -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h4><i class="fa-solid fa-building-shield"></i> Pengaturan Lokasi & Identitas Proyek</h4>
+                  <p class="card-subtitle">Perbarui data identitas proyek aktif, jenis proyek, alamat, kota, dan penanggung jawab</p>
+                </div>
+                <span class="badge badge-primary" id="settingsActiveBadge"><i class="fa-solid fa-circle-check"></i> Proyek Aktif</span>
+              </div>
+              <form id="formSettings" class="card-body">
+                <div class="form-group">
+                  <label for="setProjectName">Nama Proyek Konstruksi <span class="required">*</span></label>
+                  <input type="text" id="setProjectName" class="form-input" placeholder="Contoh: Proyek Pembangunan Gedung Mandiri Tower" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-half">
+                    <label for="setProjectType">Jenis Proyek <span class="required">*</span></label>
+                    <select id="setProjectType" class="form-select" required>
+                      <option value="Gedung">Gedung (Building)</option>
+                      <option value="Jalan">Jalan (Highway / Road)</option>
+                      <option value="Jembatan">Jembatan (Bridge / Flyover)</option>
+                      <option value="Lainnya">Lainnya (Infrastruktur / Sumber Daya Air)</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-half">
+                    <label for="setContractor">Nama Kontraktor Utama / Konsultan <span class="required">*</span></label>
+                    <input type="text" id="setContractor" class="form-input" placeholder="Contoh: PT Graha Konstruksi Pratama" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="setAddress">Alamat Lengkap Proyek <span class="required">*</span></label>
+                  <input type="text" id="setAddress" class="form-input" placeholder="Contoh: Jl. Ring Road Utara No. 45, Condongcatur" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-half">
+                    <label for="setCity">Kota / Kabupaten <span class="required">*</span></label>
+                    <input type="text" id="setCity" class="form-input" placeholder="Contoh: Kabupaten Sleman" required>
+                  </div>
+                  <div class="form-group col-half">
+                    <label for="setProvince">Provinsi <span class="required">*</span></label>
+                    <input type="text" id="setProvince" class="form-input" placeholder="Contoh: D.I. Yogyakarta" required>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-half">
+                    <label for="setProjectManager">Nama Penanggung Jawab Proyek (Project Manager) <span class="required">*</span></label>
+                    <input type="text" id="setProjectManager" class="form-input" placeholder="Contoh: Ir. Hendra Pratama, S.T., M.T." required>
+                  </div>
+                  <div class="form-group col-half">
+                    <label for="setHseOfficer">Nama Petugas HSE / Mahasiswa <span class="required">*</span></label>
+                    <input type="text" id="setHseOfficer" class="form-input" placeholder="Contoh: Zahra Faizatun Najma" required>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-half">
+                    <label for="setHseNim">NIM / Nomor Registrasi</label>
+                    <input type="text" id="setHseNim" class="form-input" placeholder="Contoh: 2410503008 (TS01)">
+                  </div>
+                  <div class="form-group col-half">
+                    <label for="setSafeHours">Jam Kerja Selamat Tercapai (Safe Hours)</label>
+                    <input type="number" id="setSafeHours" class="form-input" min="0">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-half">
+                    <label for="setTargetHours">Target Jam Kerja (Zero Accident)</label>
+                    <input type="number" id="setTargetHours" class="form-input" min="0">
+                  </div>
+                  <div class="form-group col-half" style="display:flex; align-items:flex-end;">
+                    <span class="text-sm text-muted" style="margin-bottom: 12px;"><i class="fa-solid fa-circle-info"></i> Perubahan data akan diverifikasi melalui konfirmasi sebelum disimpan.</span>
+                  </div>
+                </div>
+
+                <div class="form-actions mt-4">
+                  <button type="submit" class="btn btn-primary" id="btnSaveSettings">
+                    <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
+                  </button>
+                  <button type="button" class="btn btn-outline" id="btnResetSettings">
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Kartu Manajemen Multi-Proyek & Backup Data -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h4><i class="fa-solid fa-folder-tree"></i> Manajemen Multi-Proyek Konstruksi</h4>
+                  <p class="card-subtitle">Beralih antarproyek atau daftarkan proyek baru dengan data terisolasi</p>
+                </div>
+                <button class="btn btn-primary btn-sm" id="btnOpenModalNewProject">
+                  <i class="fa-solid fa-plus"></i> Tambah Proyek Baru
+                </button>
+              </div>
+              <div class="card-body">
+                <!-- Tabel Daftar Proyek -->
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Nama Proyek</th>
+                        <th>Jenis</th>
+                        <th>Kota / Provinsi</th>
+                        <th>Status</th>
+                        <th class="text-center">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tableProjectsTbody">
+                      <!-- Injected via JS -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Backup & Restore -->
+                <div class="data-manage-box mt-4">
+                  <div class="manage-item">
+                    <div>
+                      <strong>Cadangkan Seluruh Proyek (Backup JSON)</strong>
+                      <p class="text-muted text-sm">Unduh data semua proyek konstruksi, inspeksi, HIRADC, dan temuan.</p>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btnBackupJson">
+                      <i class="fa-solid fa-download"></i> Unduh Cadangan
+                    </button>
+                  </div>
+
+                  <div class="manage-item">
+                    <div>
+                      <strong>Pulihkan Data (Restore JSON)</strong>
+                      <p class="text-muted text-sm">Unggah berkas cadangan JSON yang telah disimpan sebelumnya.</p>
+                      <input type="file" id="inputRestoreJson" accept=".json" style="display:none">
+                    </div>
+                    <button class="btn btn-outline btn-sm" id="btnTriggerRestore">
+                      <i class="fa-solid fa-upload"></i> Unggah Cadangan
+                    </button>
+                  </div>
+
+                  <div class="manage-item danger-item">
+                    <div>
+                      <strong>Pulihkan ke Data Demo Awal</strong>
+                      <p class="text-muted text-sm">Kembalikan data proyek gedung & jembatan bawaan.</p>
+                    </div>
+                    <button class="btn btn-danger-outline btn-sm" id="btnResetDemoSettings">
+                      <i class="fa-solid fa-rotate-left"></i> Pulihkan Demo
+                    </button>
+                  </div>
+                </div>
+
+                <div class="academic-system-info mt-4">
+                  <h5><i class="fa-solid fa-circle-info"></i> Informasi Sistem Akademik</h5>
+                  <ul>
+                    <li><strong>Aplikasi:</strong> SAFEWORK HSE v1.1.0 (Multi-Project Edition)</li>
+                    <li><strong>Mata Kuliah:</strong> Aplikasi Komputer Teknik Sipil</li>
+                    <li><strong>Program Studi:</strong> S1 Teknik Sipil (Semester 5)</li>
+                    <li><strong>Acuan Regulasi:</strong> Permen PUPR No. 10/2021 (SMKK) & PP No. 50/2012 (SMK3)</li>
+                    <li><strong>Teknologi:</strong> HTML5, CSS3, JavaScript ES6+, Chart.js, LocalStorage</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+
+      <!-- FOOTER -->
+      <footer class="app-footer">
+        <div class="footer-left">
+          <span>&copy; 2026 <strong>SAFEWORK HSE</strong> - Construction Safety Management System</span>
+        </div>
+        <div class="footer-right">
+          <span>Tugas Mandiri Aplikasi Komputer Teknik Sipil | Simulasi K3 Konstruksi</span>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 1: FORM TAMBAH / EDIT INSPEKSI K3
+       ======================================================== -->
+  <div class="modal-overlay" id="modalInspeksi">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3 id="modalInspeksiTitle"><i class="fa-solid fa-clipboard-check"></i> Tambah Inspeksi K3 Baru</h3>
+        <button class="btn-modal-close" id="btnCloseModalInspeksi">&times;</button>
+      </div>
+      <form id="formInspeksi">
+        <input type="hidden" id="inspeksiId">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="inspeksiNo">Nomor Inspeksi <span class="required">*</span></label>
+              <input type="text" id="inspeksiNo" class="form-input font-mono" required readonly>
+            </div>
+            <div class="form-group col-half">
+              <label for="inspeksiTanggal">Tanggal Inspeksi <span class="required">*</span></label>
+              <input type="date" id="inspeksiTanggal" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="inspeksiArea">Area / Lokasi Kerja <span class="required">*</span></label>
+              <input type="text" id="inspeksiArea" class="form-input" placeholder="Contoh: Lantai 4 Zona Pengecoran Pelat" required>
+            </div>
+            <div class="form-group col-half">
+              <label for="inspeksiKategori">Kategori Inspeksi <span class="required">*</span></label>
+              <select id="inspeksiKategori" class="form-select" required>
+                <option value="">Pilih Kategori...</option>
+                <option value="Penggunaan APD">Penggunaan APD</option>
+                <option value="Housekeeping">Housekeeping</option>
+                <option value="Perancah dan akses kerja">Perancah dan akses kerja</option>
+                <option value="Instalasi listrik">Instalasi listrik</option>
+                <option value="Alat dan mesin">Alat dan mesin</option>
+                <option value="Pengendalian area kerja">Pengendalian area kerja</option>
+                <option value="Rambu dan pengamanan lokasi">Rambu dan pengamanan lokasi</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="inspeksiPetugas">Nama Petugas HSE <span class="required">*</span></label>
+              <input type="text" id="inspeksiPetugas" class="form-input" required>
+            </div>
+            <div class="form-group col-half">
+              <label for="inspeksiStatus">Status Inspeksi <span class="required">*</span></label>
+              <select id="inspeksiStatus" class="form-select" required>
+                <option value="Selesai">Selesai</option>
+                <option value="Perlu Tindak Lanjut">Perlu Tindak Lanjut</option>
+                <option value="Draft">Draft</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- CHECKLIST KONDISI LAPANGAN -->
+          <div class="checklist-section-box mt-3">
+            <div class="checklist-header">
+              <h5><i class="fa-solid fa-list-check"></i> Checklist Kondisi Lapangan (Standar K3 Konstruksi)</h5>
+              <span class="text-sm text-muted">Tandai kondisi setiap aspek keselamatan kerja</span>
+            </div>
+            
+            <div class="checklist-items-wrapper" id="inspeksiChecklistContainer">
+              <!-- Dynamically generated checklist items -->
+            </div>
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="inspeksiCatatan">Catatan & Rekomendasi Umum Petugas</label>
+            <textarea id="inspeksiCatatan" class="form-textarea" rows="3" placeholder="Tuliskan evaluasi ringkas dan rekomendasi tindak lanjut bagi mandor / tim proyek..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelInspeksi">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveInspeksi">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Data Inspeksi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 2: FORM TAMBAH / EDIT PENILAIAN RISIKO (HIRADC 5x5)
+       ======================================================== -->
+  <div class="modal-overlay" id="modalRisiko">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3 id="modalRisikoTitle"><i class="fa-solid fa-triangle-exclamation"></i> Penilaian Risiko (HIRADC 5×5)</h3>
+        <button class="btn-modal-close" id="btnCloseModalRisiko">&times;</button>
+      </div>
+      <form id="formRisiko">
+        <input type="hidden" id="risikoId">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="risikoNo">Nomor ID Penilaian <span class="required">*</span></label>
+              <input type="text" id="risikoNo" class="form-input font-mono" readonly required>
+            </div>
+            <div class="form-group col-half">
+              <label for="risikoPic">Penanggung Jawab (PIC) <span class="required">*</span></label>
+              <input type="text" id="risikoPic" class="form-input" placeholder="Contoh: Site Engineer / Supervisor Struktur" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="risikoAktivitas">Aktivitas Pekerjaan <span class="required">*</span></label>
+            <input type="text" id="risikoAktivitas" class="form-input" placeholder="Contoh: Pengecoran Pelat Lantai 6 dengan Concrete Pump" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="risikoBahaya">Potensi Bahaya <span class="required">*</span></label>
+              <textarea id="risikoBahaya" class="form-textarea" rows="2" placeholder="Contoh: Bekisting runtuh, pipa concrete pump tersumbat dan meledak" required></textarea>
+            </div>
+            <div class="form-group col-half">
+              <label for="risikoDampak">Konsekuensi / Dampak Bahaya <span class="required">*</span></label>
+              <textarea id="risikoDampak" class="form-textarea" rows="2" placeholder="Contoh: Pekerja tertimpa material, fatalitas, kerusakan struktural" required></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="risikoPengendalianAda">Pengendalian yang Sudah Tersedia (Existing Controls)</label>
+            <input type="text" id="risikoPengendalianAda" class="form-input" placeholder="Contoh: Pengecekan visual shoring pipa dan penggunaan helm safety">
+          </div>
+
+          <!-- INTERACTIVE 5x5 MATRIX SECTION -->
+          <div class="matrix-calculator-card">
+            <div class="calc-header">
+              <h5><i class="fa-solid fa-calculator"></i> Penentuan Nilai Risiko (Metode Matriks 5×5)</h5>
+              <span class="text-sm text-muted">Pilih nilai Kemungkinan (L) dan Keparahan (S)</span>
+            </div>
+
+            <div class="calc-selectors-row">
+              <div class="calc-select-col">
+                <label for="risikoLikelihood">Kemungkinan / Likelihood (1 - 5):</label>
+                <select id="risikoLikelihood" class="form-select" required>
+                  <option value="1">1 - Sangat Jarang (Almost Never / Rare)</option>
+                  <option value="2">2 - Jarang (Unlikely)</option>
+                  <option value="3" selected>3 - Sedang / Kadang-kadang (Possible)</option>
+                  <option value="4">4 - Sering (Likely)</option>
+                  <option value="5">5 - Sangat Sering (Almost Certain)</option>
+                </select>
+              </div>
+
+              <div class="calc-operator">×</div>
+
+              <div class="calc-select-col">
+                <label for="risikoSeverity">Keparahan / Severity (1 - 5):</label>
+                <select id="risikoSeverity" class="form-select" required>
+                  <option value="1">1 - Tidak Signifikan (First Aid)</option>
+                  <option value="2">2 - Ringan (Medical Treatment)</option>
+                  <option value="3">3 - Sedang (Lost Time Injury / Rawat RS)</option>
+                  <option value="4" selected>4 - Berat (Cacat Permanen / Kerusakan Besar)</option>
+                  <option value="5">5 - Fatal / Katastropik (Kematian Tunggal / Jamak)</option>
+                </select>
+              </div>
+
+              <div class="calc-result-col">
+                <label>Skor & Kategori:</label>
+                <div class="calc-score-display" id="risikoScoreBadge">
+                  <span class="score-num" id="calcScoreNum">12</span>
+                  <span class="score-label" id="calcScoreLabel">Tinggi</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mini 5x5 Matrix Visual Clicker -->
+            <div class="interactive-matrix-preview">
+              <p class="matrix-hint"><i class="fa-solid fa-hand-pointer"></i> Atau klik langsung pada sel matriks 5×5 di bawah:</p>
+              <div class="matrix-grid-5x5" id="miniMatrix5x5">
+                <!-- 5x5 cells rendered via JS -->
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="risikoPengendalianTambahan">Rekomendasi Pengendalian Tambahan (Hirarki Kontrol) <span class="required">*</span></label>
+            <textarea id="risikoPengendalianTambahan" class="form-textarea" rows="2" placeholder="Contoh: Rekayasa teknik: perhitungan beban shoring, pasang double bracing, pasang safety net di bawah pelat." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="risikoTarget">Target Tanggal Penyelesaian Kontrol <span class="required">*</span></label>
+            <input type="date" id="risikoTarget" class="form-input" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelRisiko">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveRisiko">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Penilaian Risiko
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 3: FORM TAMBAH / EDIT TEMUAN K3
+       ======================================================== -->
+  <div class="modal-overlay" id="modalTemuan">
+    <div class="modal-container modal-md">
+      <div class="modal-header">
+        <h3 id="modalTemuanTitle"><i class="fa-solid fa-magnifying-glass-chart"></i> Catat Temuan K3 Baru</h3>
+        <button class="btn-modal-close" id="btnCloseModalTemuan">&times;</button>
+      </div>
+      <form id="formTemuan">
+        <input type="hidden" id="temuanId">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="temuanNo">Nomor Temuan <span class="required">*</span></label>
+              <input type="text" id="temuanNo" class="form-input font-mono" readonly required>
+            </div>
+            <div class="form-group col-half">
+              <label for="temuanTanggal">Tanggal Temuan <span class="required">*</span></label>
+              <input type="date" id="temuanTanggal" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="temuanArea">Area / Lokasi Temuan <span class="required">*</span></label>
+              <input type="text" id="temuanArea" class="form-input" placeholder="Contoh: Lantai 5 Perimeter Barat" required>
+            </div>
+            <div class="form-group col-half">
+              <label for="temuanKategori">Kategori Temuan <span class="required">*</span></label>
+              <select id="temuanKategori" class="form-select" required>
+                <option value="">Pilih Kategori...</option>
+                <option value="Penggunaan APD">Penggunaan APD</option>
+                <option value="Housekeeping">Housekeeping</option>
+                <option value="Perancah dan akses kerja">Perancah dan akses kerja</option>
+                <option value="Instalasi listrik">Instalasi listrik</option>
+                <option value="Alat dan mesin">Alat dan mesin</option>
+                <option value="Pengendalian area kerja">Pengendalian area kerja</option>
+                <option value="Rambu dan pengamanan lokasi">Rambu dan pengamanan lokasi</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="temuanJenis">Jenis Ketidaksesuaian <span class="required">*</span></label>
+              <select id="temuanJenis" class="form-select" required>
+                <option value="Kondisi Tidak Aman (Unsafe Condition)">Kondisi Tidak Aman (Unsafe Condition)</option>
+                <option value="Tindakan Tidak Aman (Unsafe Act)">Tindakan Tidak Aman (Unsafe Act)</option>
+                <option value="Temuan Inspeksi Rutin">Temuan Inspeksi Rutin</option>
+              </select>
+            </div>
+            <div class="form-group col-half">
+              <label for="temuanRisiko">Tingkat Risiko <span class="required">*</span></label>
+              <select id="temuanRisiko" class="form-select" required>
+                <option value="Rendah">Rendah (Low)</option>
+                <option value="Sedang">Sedang (Medium)</option>
+                <option value="Tinggi" selected>Tinggi (High)</option>
+                <option value="Ekstrem">Ekstrem (Extreme)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="temuanDeskripsi">Deskripsi Temuan Lapangan <span class="required">*</span></label>
+            <textarea id="temuanDeskripsi" class="form-textarea" rows="3" placeholder="Jelaskan secara spesifik ketidaksesuaian yang ditemukan di lapangan..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="temuanTindakan">Rekomendasi Tindakan Korektif <span class="required">*</span></label>
+            <textarea id="temuanTindakan" class="form-textarea" rows="2" placeholder="Tindakan yang harus dilakukan oleh PIC untuk menghilangkan bahaya..." required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="temuanPic">Penanggung Jawab (PIC) <span class="required">*</span></label>
+              <input type="text" id="temuanPic" class="form-input" placeholder="Contoh: Mandor Besi / Subkon Mekanikal" required>
+            </div>
+            <div class="form-group col-half">
+              <label for="temuanTarget">Target Selesai <span class="required">*</span></label>
+              <input type="date" id="temuanTarget" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="temuanStatus">Status Temuan <span class="required">*</span></label>
+              <select id="temuanStatus" class="form-select" required>
+                <option value="Open">Open (Belum Ditindaklanjuti)</option>
+                <option value="In Progress">In Progress (Sedang Dikerjakan)</option>
+                <option value="Closed">Closed (Telah Selesai)</option>
+              </select>
+            </div>
+            <div class="form-group col-half">
+              <label for="temuanRefInspeksi">Hubungkan dengan Inspeksi (Opsional)</label>
+              <select id="temuanRefInspeksi" class="form-select">
+                <option value="">-- Tidak Terhubung / Mandiri --</option>
+                <!-- Injected via JS -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" id="temuanCatatanClosedGroup">
+            <label for="temuanCatatanSelesai">Catatan Penyelesaian (Opsional untuk Status Closed)</label>
+            <input type="text" id="temuanCatatanSelesai" class="form-input" placeholder="Jelaskan tindakan yang telah selesai dikerjakan...">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelTemuan">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveTemuan">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Temuan K3
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 4: DETAIL INSPEKSI K3
+       ======================================================== -->
+  <div class="modal-overlay" id="modalDetailInspeksi">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-contract"></i> Detail Hasil Inspeksi K3</h3>
+        <button class="btn-modal-close" id="btnCloseDetailInspeksi">&times;</button>
+      </div>
+      <div class="modal-body" id="detailInspeksiContent">
+        <!-- Injected via JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCloseDetailInspeksiBtn">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 5: DETAIL PENILAIAN RISIKO
+       ======================================================== -->
+  <div class="modal-overlay" id="modalDetailRisiko">
+    <div class="modal-container modal-md">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-shield-halved"></i> Detail Penilaian Risiko (HIRADC)</h3>
+        <button class="btn-modal-close" id="btnCloseDetailRisiko">&times;</button>
+      </div>
+      <div class="modal-body" id="detailRisikoContent">
+        <!-- Injected via JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCloseDetailRisikoBtn">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 6: DETAIL TEMUAN K3
+       ======================================================== -->
+  <div class="modal-overlay" id="modalDetailTemuan">
+    <div class="modal-container modal-md">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-circle-exclamation"></i> Detail Temuan K3 Lapangan</h3>
+        <button class="btn-modal-close" id="btnCloseDetailTemuan">&times;</button>
+      </div>
+      <div class="modal-body" id="detailTemuanContent">
+        <!-- Injected via JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCloseDetailTemuanBtn">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 7: PANDUAN MATRIKS RISIKO 5x5
+       ======================================================== -->
+  <div class="modal-overlay" id="modalMatrixGuide">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-table-cells"></i> Standar Matriks Risiko 5×5 (HIRADC K3 Konstruksi)</h3>
+        <button class="btn-modal-close" id="btnCloseMatrixGuide">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="matrix-guide-explanation">
+          <p>Penilaian risiko pada SAFEWORK HSE menggunakan standar perkalian <strong>Kemungkinan (Likelihood / Frekuensi)</strong> dengan <strong>Keparahan (Severity / Dampak)</strong>:</p>
+          <div class="formula-badge">Risk Score = Likelihood (1–5) × Severity (1–5)</div>
+        </div>
+
+        <!-- Full 5x5 Matrix Visual Table -->
+        <div class="full-matrix-table-wrap mt-3">
+          <table class="matrix-full-table">
+            <thead>
+              <tr>
+                <th rowspan="2" class="matrix-corner">Likelihood \ Severity</th>
+                <th class="matrix-th-sev sev-1">1<br><span class="th-sub">Tidak Signifikan</span></th>
+                <th class="matrix-th-sev sev-2">2<br><span class="th-sub">Ringan</span></th>
+                <th class="matrix-th-sev sev-3">3<br><span class="th-sub">Sedang</span></th>
+                <th class="matrix-th-sev sev-4">4<br><span class="th-sub">Berat</span></th>
+                <th class="matrix-th-sev sev-5">5<br><span class="th-sub">Fatalitas</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th class="matrix-th-lh lh-5">5 - Sangat Sering</th>
+                <td class="cell-med">5 (Sedang)</td>
+                <td class="cell-high">10 (Tinggi)</td>
+                <td class="cell-high">15 (Tinggi)</td>
+                <td class="cell-ext">20 (Ekstrem)</td>
+                <td class="cell-ext">25 (Ekstrem)</td>
+              </tr>
+              <tr>
+                <th class="matrix-th-lh lh-4">4 - Sering</th>
+                <td class="cell-low">4 (Rendah)</td>
+                <td class="cell-med">8 (Sedang)</td>
+                <td class="cell-high">12 (Tinggi)</td>
+                <td class="cell-high">16 (Tinggi)</td>
+                <td class="cell-ext">20 (Ekstrem)</td>
+              </tr>
+              <tr>
+                <th class="matrix-th-lh lh-3">3 - Sedang</th>
+                <td class="cell-low">3 (Rendah)</td>
+                <td class="cell-med">6 (Sedang)</td>
+                <td class="cell-med">9 (Sedang)</td>
+                <td class="cell-high">12 (Tinggi)</td>
+                <td class="cell-high">15 (Tinggi)</td>
+              </tr>
+              <tr>
+                <th class="matrix-th-lh lh-2">2 - Jarang</th>
+                <td class="cell-low">2 (Rendah)</td>
+                <td class="cell-low">4 (Rendah)</td>
+                <td class="cell-med">6 (Sedang)</td>
+                <td class="cell-med">8 (Sedang)</td>
+                <td class="cell-high">10 (Tinggi)</td>
+              </tr>
+              <tr>
+                <th class="matrix-th-lh lh-1">1 - Sangat Jarang</th>
+                <td class="cell-low">1 (Rendah)</td>
+                <td class="cell-low">2 (Rendah)</td>
+                <td class="cell-low">3 (Rendah)</td>
+                <td class="cell-low">4 (Rendah)</td>
+                <td class="cell-med">5 (Sedang)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Legend and action rules -->
+        <div class="matrix-legend-grid mt-3">
+          <div class="legend-card low-card">
+            <strong>1 - 4: Risiko Rendah (Low)</strong>
+            <p>Dapat diterima. Pengendalian rutin sudah memadai, pemantauan berkala saat inspeksi rutin.</p>
+          </div>
+          <div class="legend-card med-card">
+            <strong>5 - 9: Risiko Sedang (Medium)</strong>
+            <p>Memerlukan tindakan pencegahan terencana dan briefing keselamatan (Toolbox Meeting) sebelum bekerja.</p>
+          </div>
+          <div class="legend-card high-card">
+            <strong>10 - 16: Risiko Tinggi (High)</strong>
+            <p>Tindakan mitigasi harus segera diterapkan dengan Izin Kerja Khusus (Permit to Work) dan pengawasan HSE.</p>
+          </div>
+          <div class="legend-card ext-card">
+            <strong>17 - 25: Risiko Ekstrem (Extreme)</strong>
+            <p>Pekerjaan TIDAK BOLEH dimulai sampai bahaya dieliminasi atau dikendalikan dengan perlindungan maksimal.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCloseMatrixGuideBtn">Tutup Panduan</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 9: FORM TAMBAH PROYEK BARU (MULTI-PROJECT)
+       ======================================================== -->
+  <div class="modal-overlay" id="modalNewProject">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-folder-plus"></i> Tambah Proyek Konstruksi Baru</h3>
+        <button class="btn-modal-close" id="btnCloseModalNewProject">&times;</button>
+      </div>
+      <form id="formNewProject">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="newProjectName">Nama Proyek Konstruksi <span class="required">*</span></label>
+            <input type="text" id="newProjectName" class="form-input" placeholder="Contoh: Proyek Pembangunan Jembatan & Flyover Kali Progo" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="newProjectType">Jenis Proyek <span class="required">*</span></label>
+              <select id="newProjectType" class="form-select" required>
+                <option value="Gedung">Gedung (Building)</option>
+                <option value="Jalan">Jalan (Highway / Road)</option>
+                <option value="Jembatan" selected>Jembatan (Bridge / Flyover)</option>
+                <option value="Lainnya">Lainnya (Infrastruktur / Bendungan / Pelabuhan)</option>
+              </select>
+            </div>
+            <div class="form-group col-half">
+              <label for="newProjectContractor">Nama Kontraktor Utama / Konsultan <span class="required">*</span></label>
+              <input type="text" id="newProjectContractor" class="form-input" placeholder="Contoh: PT Wijaya Karya (Persero) Tbk" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="newProjectAddress">Alamat Lengkap Proyek <span class="required">*</span></label>
+            <input type="text" id="newProjectAddress" class="form-input" placeholder="Contoh: Jl. Daendels Pantai Selatan KM 12, Temon" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="newProjectCity">Kota / Kabupaten <span class="required">*</span></label>
+              <input type="text" id="newProjectCity" class="form-input" placeholder="Contoh: Kabupaten Kulon Progo" required>
+            </div>
+            <div class="form-group col-half">
+              <label for="newProjectProvince">Provinsi <span class="required">*</span></label>
+              <input type="text" id="newProjectProvince" class="form-input" placeholder="Contoh: D.I. Yogyakarta" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="newProjectManager">Nama Penanggung Jawab Proyek (Project Manager) <span class="required">*</span></label>
+              <input type="text" id="newProjectManager" class="form-input" placeholder="Contoh: Dr. Ir. Bagus Wicaksono, M.T." required>
+            </div>
+            <div class="form-group col-half">
+              <label for="newProjectHseOfficer">Nama Petugas HSE / Mahasiswa <span class="required">*</span></label>
+              <input type="text" id="newProjectHseOfficer" class="form-input" placeholder="Contoh: Zahra Faizatun Najma" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="newProjectHseNim">NIM / Nomor Registrasi</label>
+              <input type="text" id="newProjectHseNim" class="form-input" placeholder="Contoh: 2410503008 (TS01)">
+            </div>
+            <div class="form-group col-half">
+              <label for="newProjectSafeHours">Target Jam Kerja Selamat (Zero Accident)</label>
+              <input type="number" id="newProjectSafeHours" class="form-input" min="0" value="500000">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelNewProject">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveNewProject">
+            <i class="fa-solid fa-plus"></i> Buat & Aktifkan Proyek
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 10: PILIH / BERALIH PROYEK AKTIF
+       ======================================================== -->
+  <div class="modal-overlay" id="modalSwitchProject">
+    <div class="modal-container modal-md">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-map-location-dot"></i> Beralih Proyek Konstruksi</h3>
+        <button class="btn-modal-close" id="btnCloseModalSwitch">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-sm text-muted mb-3">Pilih salah satu proyek konstruksi di bawah ini untuk melihat dan mengelola data K3 (Inspeksi, HIRADC, dan Temuan) khusus untuk proyek tersebut:</p>
+        <div class="project-switch-list" id="projectSwitchList">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button type="button" class="btn btn-outline btn-sm" id="btnSwitchAddNew">
+          <i class="fa-solid fa-plus"></i> Daftarkan Proyek Baru
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnCloseModalSwitchBtn">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================
+       MODAL 8: DIALOG KONFIRMASI HAPUS & RESET
+       ======================================================== -->
+  <div class="modal-overlay" id="modalConfirm">
+    <div class="modal-container modal-sm">
+      <div class="modal-header">
+        <h3 id="confirmModalTitle"><i class="fa-solid fa-triangle-exclamation text-danger"></i> Konfirmasi Tindakan</h3>
+        <button class="btn-modal-close" id="btnCloseConfirm">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmModalMessage">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCancelConfirm">Batal</button>
+        <button type="button" class="btn btn-danger" id="btnOkConfirm">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script src="app.js"></script>
+</body>
+</html>
